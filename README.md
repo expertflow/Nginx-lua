@@ -57,3 +57,7 @@ curl --location --request POST 'https://<FQDN>/ccm/360notifications' \
     }]
 }'
 ```
+This will show you the following response which indicates that the configurations are working in perfect manner.
+```
+ Expertflow Log4J Forbidden
+```
