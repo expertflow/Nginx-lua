@@ -31,3 +31,10 @@ This implementation will provide a quick fix for the vulnerability [CVE-2021-442
 ````
 3. Now we need to update the `/path/to/release/active/docker-compose-service-gateway.yml` file. 
 - Update the `image:` entry with the `expertflow/nginx-lua:debian-1.21.4`
+- Navigate to the `volume:` section and mount these files to docker container by adding the following command:
+```
+    volumes:
+      - /path/to/release/docker/nginx/https-singleton.conf:/etc/nginx/conf.d/https.conf
+      - /path/to/release/docker/nginx/nginx-lua.conf:/etc/nginx/nginx.conf
+      - /path/to/release/docker/nginx/cve_2021_44228.lua:/usr/local/lib/lua/cve_2021_44228.lua
+      - /path/to/release/docker/nginx/lua.conf:/etc/nginx/conf.d/lua.conf
