@@ -1,6 +1,6 @@
 
 # nginx-lua
-This repository contains the configuration for the mitigation of Log4j vulnerabilities in the JAVA application. Nginx with the help of lua module will prevent the attacker to access vulnerable JAVA application
+This repository contains the configuration for the mitigation of Log4j vulnerabilities in the JAVA applications. Nginx, with the help of lua module, will prevent the attacker to access vulnerable JAVA application
 
 
 ## Description
