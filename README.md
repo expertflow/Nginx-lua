@@ -37,7 +37,7 @@ include /etc/nginx/https-lua.conf
 
 
 
-4. Now we need to update the `docker-compose.yml` file of the nignx. 
+3. Now we need to update the `docker-compose.yml` file of the nignx. 
 - Update the `image:` entry with the `expertflow/nginx-lua:debian-1.21.4`
 - Navigate to the `volume:` section and mount these files to docker container by adding the following code:
 ```
@@ -48,7 +48,7 @@ include /etc/nginx/https-lua.conf
       - /path/to/nginx_volume_mount/cve_2021_44228.lua:/usr/local/lib/lua/cve_2021_44228.lua
       - /path/to/nginx_volume_mount/lua.conf:/etc/nginx/conf.d/lua.conf
 ```
-5. Now just remove the nginx container and start it again. 
+4. Now just remove the nginx container and start it again. 
 
 ### Testing
 We can now test our implementation whether it's blocking the exploit in the request or not. To test it, send the following request with the exploit present in the header and body with `curl`. Just replace the string `<FQDN>` with your FQDN.
