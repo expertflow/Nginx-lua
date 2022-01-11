@@ -10,7 +10,7 @@ This implementation will provide a quick fix for the vulnerability [CVE-2021-442
 
 
 ## Requirements
-1. Expertflow has built Debian-based Nginx image with lua module build-in. Just pull the docker image of nginx from the Expertflow Dockerhub registry.
+1. Expertflow has built Debian-based Nginx image with lua module build-in. Just pull the docker image of nginx from the [Expertflow Dockerhub registry](https://hub.docker.com/r/expertflow/nginx-lua/tags).
 2. Update the `nginx.conf` file
 3. Clone and mount the `nginx-lua.conf` `lua.conf`, and `cve_2021_44228.lua` files to your nginx container.
 
