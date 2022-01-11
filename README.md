@@ -6,7 +6,7 @@ Special thanks to [John H Patton
 
 
 ## Description
-This implementation will provide a quick fix for the vulnerability [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228). Expertflow latest release is not vulnerable to this vulnerability and we recommend you to update to the latest release. However, this is also one way to mitigate the risk of remote code execution with the help of Nginx + lua module. After this implementation, each request will be inspected by Nginx and if the request has exploit to remotely execute the code in either its header or in the body, the request will be dropped and won't make its way to the internal application.
+This implementation will provide a quick fix for the vulnerability [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228). By following this guide, we can mitigate the risk of remote code execution with the help of Nginx + lua module. After this implementation, each request will be inspected by Nginx and if the request has exploit to remotely execute the code in either its header or in the body, the request will be dropped and won't make its way to the internal application.
 
 
 ## Requirements
